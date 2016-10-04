@@ -8,30 +8,11 @@ var es = require('event-stream');
 var rs = require('replacestream');
 
 var defaults = {
-  env: 'development',
   hashes: {},
   assetRoot: '',
-  assetURL: '/',
   tokenRegExp: /ASSET{(.*?)}/g,
   hashLength: 8
 };
-
-
-// Changes paths like so:
-// ASSET{/src/script.js,gz,min} => /src/script.min.js.gz
-function getProductionPath(assetPath, flags) {
-  var ext = path.extname(assetPath);
-  var filename = assetPath.slice(0, assetPath.lastIndexOf(ext));
-  var out = filename;
-  if (_.contains(flags, 'min')) {
-    out += '.min';
-  }
-  out += ext;
-  if (_.contains(flags, 'gz')) {
-    out += '.gz';
-  }
-  return out;
-}
 
 var plugin = function(options) {
   var opts = _.extend({}, defaults, options);
@@ -41,11 +22,7 @@ var plugin = function(options) {
     var args = _.map(_.rest(parts), _.trim);
     var p = path.join(opts.assetRoot, assetPath);
     var digest = (opts.hashes[p] || '');
-    var u = url.parse(opts.assetURL);
-    if (options.env === 'production') {
-      assetPath = getProductionPath(assetPath, args);
-    }
-    u.pathname += assetPath;
+    var u = url.parse(assetPath);
     if (digest) {
       u.query = _.extend({}, u.query, {v: digest.substr(0, opts.hashLength)});
     }
