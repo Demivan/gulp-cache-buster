@@ -49,7 +49,7 @@ var plugin = function(options) {
     if (digest) {
       u.query = _.extend({}, u.query, {v: digest.substr(0, opts.hashLength)});
     }
-    return url.format(u);
+    return match.replace(assetPath, url.format(u));
   };
   return es.map(function(file, cb) {
     var out = file;
